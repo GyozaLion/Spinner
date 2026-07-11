@@ -68,7 +68,7 @@
   /* ---------- Layout shell ---------- */
   .wrap{
     position:relative; z-index:1;
-    max-width:1080px; margin:0 auto; padding:0 20px 80px;
+    max-width:820px; margin:0 auto; padding:0 20px 80px;
   }
 
   header.hero{
@@ -111,12 +111,10 @@
   /* ---------- Main layout ---------- */
   main{
     display:grid;
-    grid-template-columns: minmax(0,1fr) minmax(0,1.15fr);
+    grid-template-columns: 1fr;
     gap:28px;
     align-items:start;
-  }
-  @media (max-width: 860px){
-    main{ grid-template-columns: 1fr; }
+    justify-items:center;
   }
 
   .panel{
@@ -241,10 +239,12 @@
     display:flex; flex-direction:column; align-items:center;
     text-align:center;
     padding-top:30px;
+    width:100%;
+    max-width:680px;
   }
   .wheel-stage{
     position:relative;
-    width:min(76vw, 380px);
+    width:min(92vw, 600px);
     aspect-ratio:1/1;
     margin: 6px auto 22px;
   }
@@ -359,7 +359,32 @@
   </header>
 
   <main>
-    <!-- LEFT: options builder -->
+    <!-- WHEEL: centered, top -->
+    <section class="panel wheel-panel" aria-labelledby="roda-heading">
+      <h2 id="roda-heading" class="sr-only">Roda Putar</h2>
+
+      <div class="wheel-stage">
+        <svg class="pointer" viewBox="0 0 40 40" aria-hidden="true">
+          <path d="M20 34 L5 8 Q20 16 35 8 Z" fill="#fb923c" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+        <canvas id="wheelCanvas" width="640" height="640"></canvas>
+        <button class="hub" id="spinBtn" aria-label="Putar roda">PUTAR</button>
+      </div>
+
+      <div class="result-wrap">
+        <div class="result-card" id="resultCard">
+          <div>
+            <div class="tag">Yang kepilih</div>
+            <div class="value" id="resultValue">—</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="hint" id="hintText">Klik tombol tengah roda buat mulai muter.</p>
+      <div class="sr-only" aria-live="polite" id="liveRegion"></div>
+    </section>
+
+    <!-- OPTIONS: below wheel -->
     <section class="panel" aria-labelledby="isi-roda-heading">
       <h2 id="isi-roda-heading">🍽️ Isi Roda</h2>
       <p class="panel-sub">Tambahin angka, nama anggota keluarga, atau menu — bebas.</p>
@@ -389,35 +414,10 @@
         <span id="minWarning" style="color:#c2410c; display:none;">min. 2 pilihan</span>
       </div>
     </section>
-
-    <!-- RIGHT: wheel -->
-    <section class="panel wheel-panel" aria-labelledby="roda-heading">
-      <h2 id="roda-heading" class="sr-only">Roda Putar</h2>
-
-      <div class="wheel-stage">
-        <svg class="pointer" viewBox="0 0 40 40" aria-hidden="true">
-          <path d="M20 34 L5 8 Q20 16 35 8 Z" fill="#fb923c" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
-        </svg>
-        <canvas id="wheelCanvas" width="640" height="640"></canvas>
-        <button class="hub" id="spinBtn" aria-label="Putar roda">PUTAR</button>
-      </div>
-
-      <div class="result-wrap">
-        <div class="result-card" id="resultCard">
-          <div>
-            <div class="tag">Yang kepilih</div>
-            <div class="value" id="resultValue">—</div>
-          </div>
-        </div>
-      </div>
-
-      <p class="hint" id="hintText">Klik tombol tengah roda buat mulai muter.</p>
-      <div class="sr-only" aria-live="polite" id="liveRegion"></div>
-    </section>
   </main>
 
   <footer>
-    Made with <span class="heart">♥</span> for LOE FAMILY EAT TOGETHER — silakan di-fork &amp; dipakai lagi tiap acara kumpul.
+    Made with <span class="heart">♥</span> for LOE FAMILY EAT TOGETHER — Gyoza Lion Present &amp; 
   </footer>
 </div>
 
