@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<!-- Library Confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
 <style>
   :root{
     --sky-50:  #f0f9ff;
@@ -44,6 +47,22 @@
       linear-gradient(180deg, var(--sky-50) 0%, var(--sky-100) 45%, var(--sky-50) 100%);
     -webkit-font-smoothing: antialiased;
     overflow-x:hidden;
+  }
+
+  /* Efek Gelap Saat Menang */
+  body.has-winner::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 58, 92, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 40;
+    animation: fade-in 0.3s ease forwards;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   a{ color:inherit; }
@@ -123,6 +142,7 @@
     box-shadow: var(--shadow);
     border: 1px solid rgba(12,58,92,0.06);
     padding: 26px 24px 28px;
+    width: 100%;
   }
 
   .panel h2{
@@ -241,6 +261,8 @@
     padding-top:30px;
     width:100%;
     max-width:680px;
+    position: relative;
+    z-index: 10;
   }
   .wheel-stage{
     position:relative;
@@ -290,29 +312,35 @@
     min-height: 78px;
     display:flex; align-items:center; justify-content:center;
     width:100%;
+    position: relative;
+    z-index: 50; /* Di atas layar gelap */
   }
   .result-card{
     display:none;
     align-items:center; gap:14px;
     background: linear-gradient(135deg, var(--sun-300), var(--sun-400));
     border-radius:18px;
-    padding:14px 22px;
-    box-shadow: 0 14px 28px -10px rgba(251,146,60,0.55);
-    animation: pop-in 0.4s var(--ease-spin);
+    padding:14px 30px;
+    box-shadow: 0 0 40px rgba(251, 146, 60, 0.8), 0 14px 28px -10px rgba(251,146,60,0.55);
+    animation: pop-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transform: scale(0);
   }
   .result-card.show{ display:inline-flex; }
-  @keyframes pop-in{
-    from{ transform:scale(0.7); opacity:0; }
-    to{ transform:scale(1); opacity:1; }
+  
+  @keyframes pop-bounce {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
   }
+
   .result-card .tag{
-    font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em;
+    font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em;
     color:#7c2d12; opacity:0.8;
   }
   .result-card .value{
     font-family:'Fredoka', sans-serif;
-    font-size:26px; font-weight:700; color:#7c2d12;
-    max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    font-size:32px; font-weight:700; color:#7c2d12;
+    max-width:320px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   .sr-only{
     position:absolute; width:1px; height:1px; padding:0; margin:-1px;
@@ -324,16 +352,6 @@
     margin-top:50px; padding-top:20px; border-top:1px dashed var(--sky-200);
   }
   footer .heart{ color:var(--sun-500); }
-
-  /* confetti */
-  .confetti-piece{
-    position:fixed; top:-10px; z-index:50; pointer-events:none;
-    border-radius:2px;
-    animation: fall linear forwards;
-  }
-  @keyframes fall{
-    to{ transform: translateY(105vh) rotate(var(--rot)); opacity:0.9; }
-  }
 </style>
 </head>
 <body>
@@ -355,7 +373,7 @@
   <header class="hero">
     <span class="eyebrow"><span class="dot"></span> Kumpul Keluarga Besar</span>
     <h1 class="title">LOE FAMILY<br>EAT <span class="accent">TOGETHER</span></h1>
-    <p class="subtitle">Muter roda buat nentuin <strong>giliran</strong>, <strong>menu</strong>, atau <strong>tantangan</strong> malam ini. Isi sendiri angka atau namanya, terus putar rodanya!</p>
+    <p class="subtitle">Muter roda buat nentuin <strong>Pemenangn</strong>, <strong>Undian</strong>, atau <strong>tantangan</strong> Semoga beruntung!</p>
   </header>
 
   <main>
@@ -387,11 +405,11 @@
     <!-- OPTIONS: below wheel -->
     <section class="panel" aria-labelledby="isi-roda-heading">
       <h2 id="isi-roda-heading">🍽️ Isi Roda</h2>
-      <p class="panel-sub">Tambahin angka, nama anggota keluarga, atau menu — bebas.</p>
+      <p class="panel-sub">Tambahin satuan atau rentang angka sekaligus (contoh: <strong>1-30</strong>)</p>
 
       <form class="add-row" id="addForm">
         <label for="optInput" class="sr-only">Tambah pilihan</label>
-        <input type="text" id="optInput" placeholder="Contoh: 7, Om Budi, Ayam Bakar…" autocomplete="off">
+        <input type="text" id="optInput" placeholder="Contoh: 1-30, 7, Om Budi, Ayam Bakar…" autocomplete="off">
         <button type="submit" class="btn btn-primary">+ Tambah</button>
       </form>
 
@@ -428,7 +446,7 @@
   // ---------- State ----------
   var options = ["1","2","3","4","5","6"];
   var isSpinning = false;
-  var currentRotation = 0; // cumulative degrees
+  var currentRotation = 0; 
 
   var COLORS = ["#38bdf8","#0ea5e9","#7dd3fc","#0284c7","#fdba74","#fb923c"];
 
@@ -477,7 +495,7 @@
     });
 
     var n = options.length;
-    countLabel.textContent = n + (n === 1 ? " pilihan siap diputar" : " pilihan siap diputar");
+    countLabel.textContent = n + " pilihan siap diputar";
     minWarning.style.display = n < 2 ? "inline" : "none";
     spinBtn.disabled = n < 2 || isSpinning;
   }
@@ -525,7 +543,7 @@
       ctx.textAlign = "right";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "#0c3a5c";
-      var fontSize = n > 16 ? 15 : n > 10 ? 19 : 24;
+      var fontSize = n > 30 ? 10 : n > 16 ? 15 : n > 10 ? 19 : 24;
       ctx.font = "700 " + fontSize + "px 'Plus Jakarta Sans', sans-serif";
       var label = String(options[i]);
       var maxChars = n > 12 ? 10 : 16;
@@ -547,19 +565,43 @@
     var val = raw.trim();
     if (!val) return;
     options.push(val);
-    renderList();
-    drawWheel();
   }
 
   addForm.addEventListener("submit", function(e){
     e.preventDefault();
-    var val = optInput.value;
-    // allow comma-separated bulk add
-    if (val.indexOf(",") > -1){
+    var val = optInput.value.trim();
+    if (!val) return;
+
+    // Cek pattern range (contoh: 1-30 atau 1 - 30)
+    var rangeMatch = val.match(/^\s*(\d+)\s*-\s*(\d+)\s*$/);
+
+    if (rangeMatch) {
+      var start = parseInt(rangeMatch[1], 10);
+      var end = parseInt(rangeMatch[2], 10);
+      
+      // Limit batasan maksimum loop biar browser gak hang kalo user masukin 1-99999
+      var limit = 200; 
+      if (Math.abs(start - end) > limit) {
+        alert("Batas maksimal penambahan sekaligus adalah " + limit + " angka.");
+        return;
+      }
+
+      if (start <= end) {
+        for (var i = start; i <= end; i++) addOption(i.toString());
+      } else {
+        for (var i = start; i >= end; i--) addOption(i.toString());
+      }
+    } 
+    // Cek koma untuk multiple item biasa (contoh: udin, asep, bambang)
+    else if (val.indexOf(",") > -1) {
       val.split(",").forEach(function(p){ addOption(p); });
-    } else {
+    } 
+    else {
       addOption(val);
     }
+
+    renderList();
+    drawWheel();
     optInput.value = "";
     optInput.focus();
   });
@@ -586,32 +628,40 @@
   });
 
   // ---------- Confetti ----------
-  function burstConfetti(){
+  function burstConfetti() {
     if (prefersReducedMotion) return;
-    var colors = ["#38bdf8","#fdba74","#fb923c","#0ea5e9","#ffffff"];
-    var count = 36;
-    for (var i = 0; i < count; i++){
-      var piece = document.createElement("div");
-      piece.className = "confetti-piece";
-      var size = 6 + Math.random() * 7;
-      piece.style.width = size + "px";
-      piece.style.height = (size * 0.4) + "px";
-      piece.style.left = (Math.random() * 100) + "vw";
-      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-      piece.style.setProperty("--rot", (Math.random() * 720 - 360) + "deg");
-      var duration = 2.2 + Math.random() * 1.6;
-      piece.style.animationDuration = duration + "s";
-      piece.style.animationDelay = (Math.random() * 0.3) + "s";
-      document.body.appendChild(piece);
-      (function(el, dur){
-        setTimeout(function(){ el.remove(); }, (dur + 0.5) * 1000);
-      })(piece, duration);
-    }
+    
+    var duration = 3000;
+    var end = Date.now() + duration;
+
+    (function frame() {
+      confetti({
+        particleCount: 5,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.8 },
+        colors: ['#38bdf8', '#fdba74', '#fb923c', '#0ea5e9']
+      });
+      confetti({
+        particleCount: 5,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.8 },
+        colors: ['#38bdf8', '#fdba74', '#fb923c', '#0ea5e9']
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
   }
 
   // ---------- Spin ----------
   function spin(){
     if (isSpinning || options.length < 2) return;
+    
+    // Reset state sebelumnya
+    document.body.classList.remove("has-winner");
     isSpinning = true;
     spinBtn.disabled = true;
     resultCard.classList.remove("show");
@@ -622,8 +672,7 @@
     var seg = 360 / n;
     var winnerIndex = Math.floor(Math.random() * n);
 
-    // angle (from top, clockwise) of the winning segment's center, with jitter
-    var jitter = (Math.random() * 0.6 - 0.3) * seg; // +/- 30% of segment width
+    var jitter = (Math.random() * 0.6 - 0.3) * seg; 
     var targetAngle = winnerIndex * seg + seg / 2 + jitter;
 
     var mod = ((currentRotation % 360) + 360) % 360;
@@ -640,7 +689,11 @@
       isSpinning = false;
       var winner = options[winnerIndex];
       resultValue.textContent = winner;
+      
+      // Memicu class efek pemenang
+      document.body.classList.add("has-winner");
       resultCard.classList.add("show");
+      
       hintText.textContent = "Klik tombol tengah roda buat mulai muter.";
       liveRegion.textContent = "Yang kepilih: " + winner;
       burstConfetti();
@@ -649,11 +702,9 @@
         options.splice(winnerIndex, 1);
         renderList();
         drawWheel();
-        // reset rotation baseline cleanly since indices shifted
         currentRotation = currentRotation % 360;
         canvas.style.transition = "none";
         canvas.style.transform = "rotate(" + currentRotation + "deg)";
-        // force reflow so next transition re-applies
         void canvas.offsetWidth;
       }
 
