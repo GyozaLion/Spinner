@@ -51,13 +51,13 @@
 
   a{ color:inherit; }
 
-  /* Efek Gelap Saat Menang (Sekarang terpisah dari body supaya bisa diklik) */
+  /* ---------- POP UP MODAL & OVERLAY ---------- */
   .winner-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(12, 58, 92, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 40; /* Di bawah panel roda saat menang */
+    background: rgba(12, 58, 92, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 90; /* Berada di atas segalanya kecuali modal popup */
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -66,7 +66,78 @@
   .winner-overlay.show {
     opacity: 1;
     pointer-events: auto;
-    cursor: pointer; /* Memberi tahu user ini bisa diklik untuk close */
+    cursor: pointer; 
+  }
+
+  /* Kartu Pop Up Melayang di Tengah Layar */
+  .result-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    z-index: 100;
+    display: none; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: linear-gradient(135deg, var(--sun-300), var(--sun-400));
+    border-radius: 32px;
+    padding: 40px 50px;
+    box-shadow: 0 0 60px rgba(251, 146, 60, 0.8), 0 20px 40px rgba(12, 58, 92, 0.6);
+    text-align: center;
+    opacity: 0;
+  }
+
+  .result-modal.show {
+    display: flex;
+    animation: pop-modal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  
+  @keyframes pop-modal {
+    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+
+  .result-modal .tag {
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #7c2d12;
+    opacity: 0.9;
+  }
+
+  .result-modal .value {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 72px; /* Ukuran sangat besar biar puas lihatnya */
+    font-weight: 700;
+    color: #7c2d12;
+    line-height: 1.1;
+    max-width: 90vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.3);
+    margin-bottom: 12px;
+  }
+
+  .close-btn-modal {
+    background: rgba(124, 45, 18, 0.15);
+    border: 2px solid transparent;
+    color: #7c2d12;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 12px 24px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .close-btn-modal:hover {
+    background: #7c2d12;
+    color: #ffd9a8;
   }
 
   /* ---------- Cloud layer ---------- */
@@ -265,13 +336,6 @@
     max-width:680px;
     position: relative;
     z-index: 10;
-    transition: z-index 0s 0.3s; /* Delay kembalinya z-index saat ditutup */
-  }
-  
-  /* Supaya panel roda dan hasilnya naik ke atas efek gelap saat ada pemenang */
-  body.has-winner .wheel-panel {
-    z-index: 50; 
-    transition: none;
   }
 
   .wheel-stage{
@@ -317,60 +381,6 @@
     font-size:13px; color:var(--ink-soft); max-width:280px;
   }
 
-  /* ---------- Result banner ---------- */
-  .result-wrap{
-    min-height: 78px;
-    display:flex; align-items:center; justify-content:center;
-    width:100%;
-    position: relative;
-    z-index: 60;
-  }
-  .result-card{
-    display:none;
-    align-items:center; gap:20px;
-    background: linear-gradient(135deg, var(--sun-300), var(--sun-400));
-    border-radius:18px;
-    padding:14px 20px 14px 30px;
-    box-shadow: 0 0 40px rgba(251, 146, 60, 0.8), 0 14px 28px -10px rgba(251,146,60,0.55);
-    animation: pop-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    transform: scale(0);
-  }
-  .result-card.show{ display:flex; }
-  
-  @keyframes pop-bounce {
-    0% { transform: scale(0.3); opacity: 0; }
-    50% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  .result-card .tag{
-    font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em;
-    color:#7c2d12; opacity:0.8;
-  }
-  .result-card .value{
-    font-family:'Fredoka', sans-serif;
-    font-size:32px; font-weight:700; color:#7c2d12;
-    max-width:320px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  }
-  .close-btn {
-    background: rgba(124, 45, 18, 0.1);
-    border: none;
-    color: #7c2d12;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background 0.2s;
-  }
-  .close-btn:hover {
-    background: rgba(124, 45, 18, 0.25);
-  }
-
   .sr-only{
     position:absolute; width:1px; height:1px; padding:0; margin:-1px;
     overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
@@ -385,8 +395,14 @@
 </head>
 <body>
 
-<!-- Overlay Layar Gelap (Bisa diklik untuk tutup) -->
+<!-- OVERLAY & MODAL POP UP DI TENGAH LAYAR -->
 <div id="winnerOverlay" class="winner-overlay" aria-hidden="true" title="Klik untuk menutup"></div>
+
+<div id="resultModal" class="result-modal">
+  <div class="tag">Selamat! Yang Kepilih:</div>
+  <div class="value" id="resultValue">—</div>
+  <button id="closeResultBtn" class="close-btn-modal" aria-label="Tutup Hasil">Lanjut</button>
+</div>
 
 <div class="clouds" aria-hidden="true">
   <div class="cloud" style="top:8%; left:2%; width:120px; animation-duration:32s;">
@@ -421,16 +437,7 @@
         <button class="hub" id="spinBtn" aria-label="Putar roda">PUTAR</button>
       </div>
 
-      <div class="result-wrap">
-        <div class="result-card" id="resultCard">
-          <div style="flex:1; text-align: left;">
-            <div class="tag">Yang kepilih</div>
-            <div class="value" id="resultValue">—</div>
-          </div>
-          <!-- Tombol Close -->
-          <button id="closeResultBtn" class="close-btn" aria-label="Tutup Hasil">✕</button>
-        </div>
-      </div>
+      <!-- Result div yang lama di bawah roda sudah DHAPUS -->
 
       <p class="hint" id="hintText">Klik tombol tengah roda buat mulai muter.</p>
       <div class="sr-only" aria-live="polite" id="liveRegion"></div>
@@ -493,15 +500,17 @@
   var addForm = document.getElementById("addForm");
   var optInput = document.getElementById("optInput");
   var spinBtn = document.getElementById("spinBtn");
-  var resultCard = document.getElementById("resultCard");
+  
+  // Elements untuk Modal Pop Up
+  var resultModal = document.getElementById("resultModal");
   var resultValue = document.getElementById("resultValue");
+  var winnerOverlay = document.getElementById("winnerOverlay");
+  var closeResultBtn = document.getElementById("closeResultBtn");
+
   var hintText = document.getElementById("hintText");
   var liveRegion = document.getElementById("liveRegion");
   var removeWinnerToggle = document.getElementById("removeWinnerToggle");
   var clearBtn = document.getElementById("clearBtn");
-  
-  var winnerOverlay = document.getElementById("winnerOverlay");
-  var closeResultBtn = document.getElementById("closeResultBtn");
 
   var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -664,6 +673,7 @@
   // ---------- Confetti ----------
   function burstConfetti() {
     if (prefersReducedMotion) return;
+    // Menggunakan z-index tinggi di setelan confetti supaya tampil di atas overlay
     var duration = 3000;
     var end = Date.now() + duration;
 
@@ -673,14 +683,16 @@
         angle: 60,
         spread: 55,
         origin: { x: 0, y: 0.8 },
-        colors: ['#38bdf8', '#fdba74', '#fb923c', '#0ea5e9']
+        colors: ['#38bdf8', '#fdba74', '#fb923c', '#0ea5e9'],
+        zIndex: 110 // Di atas modal
       });
       confetti({
         particleCount: 5,
         angle: 120,
         spread: 55,
         origin: { x: 1, y: 0.8 },
-        colors: ['#38bdf8', '#fdba74', '#fb923c', '#0ea5e9']
+        colors: ['#38bdf8', '#fdba74', '#fb923c', '#0ea5e9'],
+        zIndex: 110
       });
 
       if (Date.now() < end) {
@@ -692,9 +704,9 @@
   // ---------- Fitur Close Hasil ----------
   function closeWinner() {
     winnerOverlay.classList.remove("show");
-    document.body.classList.remove("has-winner");
-    resultCard.classList.remove("show");
-    confetti.reset(); // Menghentikan animasi confetti
+    resultModal.classList.remove("show");
+    document.body.style.overflow = "auto"; // Mengembalikan scroll web
+    confetti.reset(); // Menghentikan animasi confetti sisa
   }
 
   winnerOverlay.addEventListener("click", closeWinner);
@@ -732,10 +744,10 @@
       var winner = options[winnerIndex];
       resultValue.textContent = winner;
       
-      // Munculkan overlay dan kartu hasil
-      document.body.classList.add("has-winner");
+      // Munculkan Modal Pop Up di tengah layar!
+      document.body.style.overflow = "hidden"; // Kunci scroll layar supaya fokus ke popup
       winnerOverlay.classList.add("show");
-      resultCard.classList.add("show");
+      resultModal.classList.add("show");
       
       hintText.textContent = "Klik tombol tengah roda buat mulai muter.";
       liveRegion.textContent = "Yang kepilih: " + winner;
